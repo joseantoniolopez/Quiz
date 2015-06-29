@@ -6,8 +6,13 @@
     "start": "node ./bin/www"
   },
   "engines": {
+<<<<<<< HEAD
+    "node": "0.10.32",
+    "npm": "1.4.28"
+=======
     "node": "0.10.x",
     "npm": "1.4.x"
+>>>>>>> 1b215aab6103355cc0e3b523323c2bc60c6b8397
   },
   "dependencies": {
     "body-parser": "~1.8.1",
