@@ -1,5 +1,12 @@
 var models = require('../models/models.js');
 
+exports.author = function(req, res) {
+	res.render(
+		'author', 
+		{ title: 'Jose Antonio López Anguita', errors: [] }
+	);
+}
+
 // Autoload :id
 exports.load = function(req, res, next, quizId) {
   models.Quiz.find(quizId).then(
@@ -49,7 +56,7 @@ exports.answer = function(req, res) {
 // GET /quizes/new
 exports.new = function(req, res) {
   var quiz = models.Quiz.build( // crea objeto quiz 
-    {pregunta: "Pregunta", respuesta: "Respuesta"}
+    {pregunta: "Pregunta", respuesta: "Respuesta", tema: "Tema"}
   );
 
   res.render('quizes/new', {quiz: quiz, errors: []});
@@ -67,7 +74,7 @@ exports.create = function(req,res){
     }
     res.render('quizes/new', {quiz: quiz, errors: errores});
   } else{
-    quiz.save({fields:["pregunta", "respuesta"]}).then(function(){
+    quiz.save({fields:["pregunta", "respuesta", "tema"]}).then(function(){
     res.redirect('/quizes')})
   }
 };
@@ -75,7 +82,6 @@ exports.create = function(req,res){
 // GET /quizes/:id/edit
 exports.edit = function(req, res) {
   var quiz = req.quiz;  // req.quiz: autoload de instancia de quiz
-
   res.render('quizes/edit', {quiz: quiz, errors: []});
 };
 
@@ -83,6 +89,7 @@ exports.edit = function(req, res) {
 exports.update = function(req, res) {
   req.quiz.pregunta  = req.body.quiz.pregunta;
   req.quiz.respuesta = req.body.quiz.respuesta;
+  req.quiz.tema = req.body.quiz.tema;
 
   var errors = req.quiz.validate();
   
@@ -95,7 +102,14 @@ exports.update = function(req, res) {
         res.render('quizes/edit', {quiz: req.quiz, errors: err.errors});
       } else {
         req.quiz     // save: guarda campos pregunta y respuesta en DB
-        .save( {fields: ["pregunta", "respuesta"]})
+        .save( {fields: ["pregunta", "respuesta", "tema"]})
         .then( function(){ res.redirect('/quizes');});
       }     // Redirección HTTP a lista de preguntas (URL relativo)
+};
+
+// DELETE /quizes/:id
+exports.destroy = function(req, res) {
+  req.quiz.destroy().then( function() {
+    res.redirect('/quizes');
+  }).catch(function(error){next(error)});
 };
