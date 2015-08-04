@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var partials = require('express-partials');
 var methodOverride = require('method-override');
+var session = require('express-session');
 
 var routes = require('./routes/index');
 
@@ -23,9 +24,36 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.urlencoded());
-app.use(cookieParser());
+app.use(cookieParser('Quiz 2015'));
+app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(function(req,res,next){
+	if(!req.path.match(/\/login|\/logout/)){
+		req.session.redir =req.path;
+	}
+	
+    res.locals.session = req.session;
+    next();
+})
+
+app.use(function(req,res,next){
+  if(res.locals.session.user){
+    var ahora = new Date();
+    var inicio =res.locals.session.user.fecha;
+    var diferencia =parseInt((ahora-inicio)/1000);
+    
+    if (diferencia> 120){
+    
+        delete req.session.user;
+        var errors = req.session.errors || {};
+        
+        res.render ('sessions/new.ejs', {session:"expirada",errors:errors});
+    }
+  }
+  next();
+})
 
 app.use('/', routes);
 
