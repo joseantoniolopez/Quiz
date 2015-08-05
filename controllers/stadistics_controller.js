@@ -19,6 +19,7 @@ exports.show = function(req,res){
         } else {
           statistics.media_comentarios=0;
         }
+
         models.Sequelize.query('SELECT count(1) AS n FROM "Quizzes" WHERE "id" IN (SELECT DISTINCT "QuizId" FROM "Comments")').then(function(con_comentarios){
             statistics.preguntas_con_coment = con_comentarios[0].n;
             models.Sequelize.query('SELECT count(1) AS n FROM "Quizzes" WHERE "id" not IN (SELECT DISTINCT "QuizId" FROM "Comments")').then(function(sin_comentarios){
